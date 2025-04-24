@@ -6,6 +6,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth'); // Middleware to protect routes
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -50,6 +51,22 @@ router.post('/login', async (req, res, next) => {
     const payload = { user: { id: user.id } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// @route   GET /api/auth/me
+// @desc    Get current authenticated user
+// @access  Private
+
+router.get('/me', auth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
   } catch (err) {
     next(err);
   }

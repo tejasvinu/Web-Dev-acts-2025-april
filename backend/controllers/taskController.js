@@ -21,12 +21,12 @@ exports.getTasks = async (req, res, next) => {
 // @access  Public
 exports.createTask = async (req, res, next) => {
   try {
-    const { title } = req.body;
+    const { title, description = '', priority = 'medium' } = req.body;
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
     // Associate task with the logged-in user
-    const task = await Task.create({ title, user: req.user.id });
+    const task = await Task.create({ title, description, priority, user: req.user.id });
     res.status(201).json({ task });
   } catch (err) {
     next(err);
@@ -39,11 +39,11 @@ exports.createTask = async (req, res, next) => {
 exports.updateTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, completed } = req.body;
+    const { title, description, completed, priority } = req.body;
     // Only allow updating user's own tasks
     const updatedTask = await Task.findOneAndUpdate(
       { _id: id, user: req.user.id },
-      { $set: { title, completed } },
+      { $set: { title, description, completed, priority } },
       { new: true, runValidators: true }
     );
     if (!updatedTask) {
