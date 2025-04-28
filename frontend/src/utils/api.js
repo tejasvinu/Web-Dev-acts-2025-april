@@ -39,6 +39,15 @@ export const taskApi = {
   deleteTask: (id) => api.delete(`/tasks/${id}`),
 };
 
+// AI-related API calls
+export const aiApi = {
+  // Generate tasks using AI
+  generateTasks: (prompt) => api.post('/ai/generate-tasks', { prompt }),
+  
+  // Generate content using AI
+  generateContent: (prompt) => api.post('/ai/generate-content', { prompt }),
+};
+
 // Authentication-related API calls
 export const authApi = {
   // Register a new user

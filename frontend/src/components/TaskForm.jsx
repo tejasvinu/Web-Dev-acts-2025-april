@@ -1,4 +1,4 @@
-// A form component for creating and editing tasks
+// A form component styled like a paper label on cardboard
 import { useState, useEffect, useRef } from 'react';
 
 function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
@@ -74,10 +74,11 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
   };
   
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
+    // Dark themed form with subtle glow
+    <form onSubmit={handleSubmit} className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg shadow-purple-900/10 p-5 space-y-3">
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-          Title
+        <label htmlFor="title" className="block text-xs font-medium text-gray-300 mb-1">
+          Task
         </label>
         <input
           type="text"
@@ -85,61 +86,68 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
           ref={titleInputRef}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.title ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="Enter task title"
+          className={`w-full px-3 py-2 text-sm bg-gray-900 rounded-md border
+            text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500
+            ${errors.title ? 'border-red-700' : 'border-gray-700'}`}
+          placeholder="What needs to be done?"
         />
-        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+        {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title}</p>}
       </div>
       
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-          Description
+        <label htmlFor="description" className="block text-xs font-medium text-gray-300 mb-1">
+          Details
         </label>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows="3"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter task description"
+          rows="2"
+          className="w-full px-3 py-2 text-sm bg-gray-900 rounded-md border border-gray-700
+                    text-gray-100 placeholder-gray-500 focus:outline-none 
+                    focus:ring-1 focus:ring-purple-500 resize-none"
+          placeholder="Optional details..."
         ></textarea>
       </div>
+        
+      <div className="grid grid-cols-2 gap-3">
         <div>
-        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
-          Priority
-        </label>
-        <select
-          id="priority"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
+          <label htmlFor="priority" className="block text-xs font-medium text-gray-300 mb-1">
+            Priority
+          </label>
+          <select
+            id="priority"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="w-full px-3 py-2 text-xs bg-gray-900 rounded-md border border-gray-700
+                      text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="dueDate" className="block text-xs font-medium text-gray-300 mb-1">
+            Due
+          </label>
+          <input
+            type="datetime-local"
+            id="dueDate"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="w-full px-3 py-2 text-xs bg-gray-900 rounded-md border border-gray-700
+                      text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          />
+        </div>
       </div>
       
-      <div>
-        <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
-          Due Date
-        </label>
-        <input
-          type="datetime-local"
-          id="dueDate"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <p className="mt-1 text-xs text-gray-500">Set a due date and time for this task (optional)</p>
-      </div>
-      
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-1">
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="px-4 py-2 bg-purple-600 text-white text-xs font-medium rounded-md 
+                    hover:bg-purple-700 transition-colors hover:shadow-md hover:shadow-purple-900/20"
         >
           {buttonText}
         </button>

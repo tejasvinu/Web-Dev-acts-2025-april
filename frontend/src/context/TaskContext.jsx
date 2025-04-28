@@ -1,6 +1,6 @@
 // Task Context for managing tasks across components
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { taskApi } from '../utils/api';
+import { taskApi, aiApi } from '../utils/api';
 import { useAuth } from './AuthContext';
 import { generateTasks } from '../utils/geminiApi';
 
@@ -96,14 +96,8 @@ export function TaskProvider({ children }) {
     setAiError(null);
     
     try {
-      // Get API key from environment variable (should be set in Vite)
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        throw new Error('Missing Gemini API key');
-      }
-      
-      const generatedTasks = await generateTasks(apiKey, prompt);
+      // Use generateTasks without passing apiKey (now uses env var internally)
+      const generatedTasks = await generateTasks(prompt);
       
       // Add each generated task to the database
       const addedTasks = [];

@@ -23,10 +23,14 @@ const TaskSchema = new mongoose.Schema({
   completed: {
     type: Boolean,
     default: false
-  },
-  dueDate: {
+  },  dueDate: {
     type: Date,
     default: null
+  },
+  estimatedTime: {
+    type: String,
+    trim: true,
+    default: ''
   },
   createdAt: {
     type: Date,

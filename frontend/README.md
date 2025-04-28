@@ -16,9 +16,7 @@ A surreal, minimalist to-do app with AI-generated tasks powered by Google's Gemi
    ```bash
    npm install
    ```
-3. Create a `.env` file in the frontend directory with your Gemini API key:
-   ```
-   VITE_GEMINI_API_KEY=your_gemini_api_key_here
+3. No environment variables needed for the frontend as all API keys are now handled by the backend
    ```
 4. Start the development server:
    ```bash

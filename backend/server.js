@@ -25,9 +25,10 @@ app.get('/', (req, res) => {
   res.send('Hello from Express server!');
 });
 
-// Mount routes for tasks and auth
+// Mount routes for tasks, auth, and AI
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
 
 // Basic error handling middleware (placeholder for learning)
 app.use((err, req, res, next) => {

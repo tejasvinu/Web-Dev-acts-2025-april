@@ -1,6 +1,151 @@
 // React Examples page to showcase various React concepts for teaching purposes
-import React, { useState, useRef, useEffect, createContext, useContext } from 'react';
+import React, { useState, useRef, useEffect, createContext, useContext, useReducer } from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
+
+// --- ADVANCED REACT EXAMPLES ---
+
+// useReducer Example
+const initialState = { count: 0 };
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+const UseReducerExample = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <div>
+      <h3 className="font-medium text-lg mb-2">useReducer Example</h3>
+      <div className="flex items-center space-x-3">
+        <button onClick={() => dispatch({ type: 'decrement' })} className="px-3 py-1 bg-gray-700 text-white rounded">-</button>
+        <span className="text-xl font-bold">{state.count}</span>
+        <button onClick={() => dispatch({ type: 'increment' })} className="px-3 py-1 bg-rose-600 text-white rounded">+</button>
+      </div>
+      <p className="mt-2 text-sm text-gray-400">Demonstrates state management with <code>useReducer</code> for complex state logic.</p>
+    </div>
+  );
+};
+
+// Custom Hook Example
+function useWindowWidth() {
+  const [width, setWidth] = React.useState(window.innerWidth);
+  React.useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return width;
+}
+const CustomHookExample = () => {
+  const width = useWindowWidth();
+  return (
+    <div>
+      <h3 className="font-medium text-lg mb-2">Custom Hook Example</h3>
+      <p className="text-gray-300">Window width: <span className="font-mono">{width}px</span></p>
+      <p className="mt-2 text-sm text-gray-400">Shows a custom hook for window resize events.</p>
+    </div>
+  );
+};
+
+// Memoization Example
+const ExpensiveComponent = React.memo(({ value }) => {
+  const compute = React.useMemo(() => {
+    let sum = 0;
+    for (let i = 0; i < 1e7; i++) sum += i;
+    return sum + value;
+  }, [value]);
+  return <div className="text-gray-300">Expensive Computation: {compute}</div>;
+});
+const MemoizationExample = () => {
+  const [value, setValue] = React.useState(0);
+  return (
+    <div>
+      <h3 className="font-medium text-lg mb-2">Memoization Example</h3>
+      <button onClick={() => setValue(v => v + 1)} className="px-3 py-1 bg-blue-700 text-white rounded mb-2">Increment Value</button>
+      <ExpensiveComponent value={value} />
+      <p className="mt-2 text-sm text-gray-400">Uses <code>React.memo</code> and <code>useMemo</code> to optimize performance.</p>
+    </div>
+  );
+};
+
+// Portal Example
+import { createPortal } from 'react-dom';
+const PortalExample = () => {
+  const [show, setShow] = React.useState(false);
+  return (
+    <div>
+      <h3 className="font-medium text-lg mb-2">Portal Example</h3>
+      <button onClick={() => setShow(true)} className="px-3 py-1 bg-purple-700 text-white rounded">Show Modal</button>
+      {show && createPortal(
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-gray-900 p-6 rounded shadow-lg">
+            <p className="text-white mb-4">This modal is rendered with <code>createPortal</code>.</p>
+            <button onClick={() => setShow(false)} className="px-3 py-1 bg-rose-600 text-white rounded">Close</button>
+          </div>
+        </div>,
+        document.body
+      )}
+      <p className="mt-2 text-sm text-gray-400">Demonstrates rendering outside the parent DOM hierarchy.</p>
+    </div>
+  );
+};
+
+// ForwardRef Example
+const FancyInput = React.forwardRef((props, ref) => (
+  <input ref={ref} className="px-3 py-2 border border-gray-700 rounded bg-gray-800 text-white" {...props} />
+));
+const ForwardRefExample = () => {
+  const inputRef = React.useRef();
+  return (
+    <div>
+      <h3 className="font-medium text-lg mb-2">forwardRef Example</h3>
+      <FancyInput ref={inputRef} placeholder="Click button to focus me" />
+      <button onClick={() => inputRef.current.focus()} className="ml-2 px-3 py-1 bg-blue-700 text-white rounded">Focus</button>
+      <p className="mt-2 text-sm text-gray-400">Shows <code>React.forwardRef</code> for ref forwarding.</p>
+    </div>
+  );
+};
+
+// Suspense/Lazy Example
+const LazyComponent = React.lazy(() => new Promise(resolve => setTimeout(() => resolve({
+  default: () => <div className="text-green-400">I was loaded lazily!</div>
+}), 1200)));
+const SuspenseExample = () => (
+  <div>
+    <h3 className="font-medium text-lg mb-2">Suspense & Lazy Example</h3>
+    <React.Suspense fallback={<div className="text-blue-400">Loading...</div>}>
+      <LazyComponent />
+    </React.Suspense>
+    <p className="mt-2 text-sm text-gray-400">Demonstrates <code>React.lazy</code> and <code>Suspense</code> for code splitting.</p>
+  </div>
+);
+
+// Render Props Example
+const MouseTracker = ({ render }) => {
+  const [pos, setPos] = React.useState({ x: 0, y: 0 });
+  return (
+    <div
+      className="h-24 bg-gray-800 rounded flex items-center justify-center relative"
+      onMouseMove={e => setPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })}
+    >
+      {render(pos)}
+    </div>
+  );
+};
+const RenderPropsExample = () => (
+  <div>
+    <h3 className="font-medium text-lg mb-2">Render Props Example</h3>
+    <MouseTracker render={({ x, y }) => (
+      <span className="text-rose-400">Mouse: {x}, {y}</span>
+    )} />
+    <p className="mt-2 text-sm text-gray-400">Pattern for sharing code using a <code>render</code> prop.</p>
+  </div>
+);
 
 // Example component that will throw an error when clicked (for Error Boundaries demo)
 const BuggyCounter = () => {
@@ -47,7 +192,7 @@ const Card = ({ title, children }) => {
 const ConfirmationDialog = ({ title, message, onConfirm, onCancel }) => {
   return (
     <Card title={title}>
-      <p className="mb-4 text-gray-700">{message}</p>
+      <p className="mb-4 text-gray-100">{message}</p>
       <div className="flex justify-end space-x-2">
         <button
           onClick={onCancel}
@@ -80,7 +225,7 @@ const ListExample = () => {
       <h3 className="font-medium text-lg mb-2">List Example with Keys</h3>
       <ul className="list-disc pl-5 space-y-1">
         {items.map(item => (
-          <li key={item.id} className="text-gray-700">{item.text}</li>
+          <li key={item.id} className="text-gray-100">{item.text}</li>
         ))} 
       </ul>
     </div>
@@ -113,7 +258,7 @@ const FormExample = () => {
       <h3 className="font-medium text-lg mb-2">Form Example</h3>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-100 mb-1">
             Name
           </label>
           <input
@@ -126,7 +271,7 @@ const FormExample = () => {
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-100 mb-1">
             Email
           </label>
           <input
@@ -139,7 +284,7 @@ const FormExample = () => {
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="message" className="block text-sm font-medium text-gray-100 mb-1">
             Message
           </label>
           <textarea
@@ -160,7 +305,7 @@ const FormExample = () => {
           </button>
         </div>
       </form>
-      <div className="mt-4 p-3 bg-gray-100 rounded">
+      <div className="mt-4 p-3 bg-gray-900 rounded">
         <p className="font-medium">Form State:</p>
         <pre className="text-xs">{JSON.stringify(formData, null, 2)}</pre>
       </div>
@@ -300,8 +445,8 @@ class Clock extends React.Component {
     return (
       <div>
         <h3 className="font-medium text-lg mb-2">Class Component: Clock</h3>
-        <p className="text-gray-700">Current Time: {this.state.date.toLocaleTimeString()}</p>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="text-gray-100">Current Time: {this.state.date.toLocaleTimeString()}</p>
+        <p className="mt-2 text-sm text-gray-100">
           Demonstrates class component structure, state management (`this.state`, `this.setState`),
           and lifecycle methods (`componentDidMount`, `componentWillUnmount`) for setting up and cleaning up resources (like timers).
         </p>
@@ -496,190 +641,178 @@ function ReactExamples() {
   const [showClock, setShowClock] = useState(true);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">React Teaching Examples</h1>
+    // Adjusted container for better theme integration
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-xl border border-gray-800 text-gray-100">
+      <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 sm:mb-8 text-rose-400 drop-shadow-lg tracking-tight text-center">React Teaching Examples</h1>
 
       {/* Section: Core Concepts */}
-      <section className="mb-8 p-6 bg-indigo-50 rounded-lg border border-indigo-100">
-        <h2 className="text-xl font-semibold mb-3 text-indigo-800">Core Concepts</h2>
-        <div className="space-y-3">
+      <section className="mb-8 sm:mb-10 p-4 sm:p-6 bg-gray-800/70 rounded-xl border border-gray-700 shadow-md">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5 text-rose-300 tracking-wide">Core Concepts</h2>
+        <div className="space-y-4 sm:space-y-5">
           <div>
-            <h3 className="font-medium">React Elements & JSX</h3>
-            <p className="text-sm text-gray-700">
-              React uses JSX (JavaScript XML), a syntax extension allowing you to write HTML-like structures in JavaScript.
-              These structures are compiled into `React.createElement()` calls, which create objects called React Elements.
+            <h3 className="font-semibold text-base sm:text-lg text-blue-200 mb-1">React Elements & JSX</h3>
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              React uses <span className="font-mono bg-gray-700 px-1 rounded text-xs">JSX</span> (JavaScript XML), a syntax extension allowing you to write HTML-like structures in JavaScript.<br/>
+              These structures are compiled into <span className="font-mono bg-gray-700 px-1 rounded text-xs">React.createElement()</span> calls, which create objects called React Elements.<br/>
               These elements describe what you want to see on the screen.
             </p>
-            <pre className="text-xs bg-gray-100 p-2 rounded mt-1"><code>{`const element = <h1 className="greeting">Hello, world!</h1>;`}</code></pre>
+            <pre className="text-xs bg-gray-900 p-2 rounded mt-2 text-rose-200 overflow-x-auto"><code>{`const element = <h1 className="greeting">Hello, world!</h1>;`}</code></pre>
           </div>
           <div>
-            <h3 className="font-medium">Function vs. Class Components</h3>
-            <p className="text-sm text-gray-700">
-              React components let you split the UI into independent, reusable pieces.
-              <br />- <strong>Function Components:</strong> Simpler, often preferred with Hooks (`useState`, `useEffect`). Example: `ListExample`.
-              <br />- <strong>Class Components:</strong> Use ES6 classes, have lifecycle methods, manage state with `this.state`. Example: `Clock` below.
+            <h3 className="font-semibold text-base sm:text-lg text-blue-200 mb-1">Function vs. Class Components</h3>
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              <span className="font-bold">Function Components:</span> Simpler, often preferred with Hooks (<span className="font-mono bg-gray-700 px-1 rounded text-xs">useState</span>, <span className="font-mono bg-gray-700 px-1 rounded text-xs">useEffect</span>). Example: <span className="font-mono bg-gray-700 px-1 rounded text-xs">ListExample</span>.<br/>
+              <span className="font-bold">Class Components:</span> Use ES6 classes, have lifecycle methods, manage state with <span className="font-mono bg-gray-700 px-1 rounded text-xs">this.state</span>. Example: <span className="font-mono bg-gray-700 px-1 rounded text-xs">Clock</span> below.
             </p>
           </div>
-           <div>
-            <h3 className="font-medium">Props vs. State vs. Context</h3>
-            <p className="text-sm text-gray-700">
-              - <strong>Props:</strong> (Properties) Read-only data passed down from parent to child components. Example: `Card` title.
-              <br />- <strong>State:</strong> Data managed *within* a component that can change over time, triggering re-renders. Example: `FormExample` input values, `Clock` time.
-              <br />- <strong>Context:</strong> A way to pass data through the component tree without having to pass props down manually at every level. Example: `ContextExample` theme.
+          <div>
+            <h3 className="font-semibold text-base sm:text-lg text-blue-200 mb-1">Props vs. State vs. Context</h3>
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              <span className="font-bold">Props:</span> (Properties) Read-only data passed down from parent to child components. Example: <span className="font-mono bg-gray-700 px-1 rounded text-xs">Card</span> title.<br/>
+              <span className="font-bold">State:</span> Data managed <i>within</i> a component that can change over time, triggering re-renders. Example: <span className="font-mono bg-gray-700 px-1 rounded text-xs">FormExample</span> input values, <span className="font-mono bg-gray-700 px-1 rounded text-xs">Clock</span> time.<br/>
+              <span className="font-bold">Context:</span> A way to pass data through the component tree without having to pass props down manually at every level. Example: <span className="font-mono bg-gray-700 px-1 rounded text-xs">ContextExample</span> theme.
             </p>
           </div>
         </div>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-10">
         {/* Column 1 */}
-        <div className="space-y-6">
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Class Component & Lifecycle</h2>
-             <button
+        <div className="space-y-6 sm:space-y-8">
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-rose-200">Class Component & Lifecycle</h2>
+            <button
               onClick={() => setShowClock(!showClock)}
-              className="px-3 py-1 mb-3 text-sm bg-gray-200 rounded hover:bg-gray-300"
+              className="px-3 py-1 mb-3 text-xs bg-gray-200 text-gray-800 rounded hover:bg-gray-300 font-semibold transition"
             >
               {showClock ? 'Unmount Clock' : 'Mount Clock'}
             </button>
-            {showClock && <Clock />} {/* Conditionally render Clock */}
-             {!showClock && <p className="text-sm text-gray-500">Clock component is unmounted.</p>}
-             <p className="mt-2 text-xs text-gray-500">Check the console to see mount/unmount logs.</p>
+            {showClock && <Clock />}
+            {!showClock && <p className="text-sm text-gray-400">Clock component is unmounted.</p>}
+            <p className="mt-2 text-xs text-gray-500">Check the console to see mount/unmount logs.</p>
           </section>
 
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Lists and Keys</h2>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-rose-200">Lists and Keys</h2>
             <ListExample />
           </section>
 
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Working with Forms</h2>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-rose-200">Working with Forms</h2>
             <FormExample />
           </section>
 
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Refs and the DOM</h2>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-rose-200">Refs and the DOM</h2>
             <RefsExample />
           </section>
 
-           <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Dynamic Styling</h2>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-rose-200">Dynamic Styling</h2>
             <DynamicStylingExample />
           </section>
 
+          {/* --- ADVANCED REACT EXAMPLES --- */}
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">useReducer</h2>
+            <UseReducerExample />
+          </section>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Custom Hook</h2>
+            <CustomHookExample />
+          </section>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Memoization</h2>
+            <MemoizationExample />
+          </section>
         </div>
 
         {/* Column 2 */}
-        <div className="space-y-6">
-           <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Conditional Rendering</h2>
-            <ConditionalRenderingExample />
+        <div className="space-y-6 sm:space-y-8">
+           <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Portals</h2>
+            <PortalExample />
           </section>
-
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Lifting State Up</h2>
-            <LiftingStateUpExample />
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">forwardRef</h2>
+            <ForwardRefExample />
           </section>
-
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Context API</h2>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Suspense & Lazy</h2>
+            <SuspenseExample />
+          </section>
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Render Props</h2>
+            <RenderPropsExample />
+          </section>
+          {/* Add Context Example here */}
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Context API</h2>
             <ContextExample />
           </section>
-
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Handling Events & Side Effects (`useEffect`)</h2>
+          {/* Add Data Fetching Example here */}
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-blue-300">Data Fetching (useEffect)</h2>
             <DataFetchingExample />
-             <p className="mt-3 text-sm text-gray-600">
-              Event handling (like `onClick`, `onChange`) allows components to respond to user interactions. `useEffect` handles side effects like data fetching, subscriptions, or manual DOM manipulations after rendering.
-            </p>
           </section>
-
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Error Boundaries</h2>
-            <p className="mb-2 text-sm text-gray-600">
-              Error Boundaries catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
-            </p>
-            <ErrorBoundary>
-              <BuggyCounter />
-            </ErrorBoundary>
+          {/* Add Error Boundary Example here */}
+          <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+            <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-red-300">Error Boundaries</h2>
+             <ErrorBoundary>
+               <BuggyCounter />
+             </ErrorBoundary>
+             <p className="mt-2 text-xs text-gray-500">Wraps components to catch errors and display fallback UI.</p>
           </section>
-
-          <section className="p-4 border rounded-lg shadow-sm bg-white">
-            <h2 className="text-xl font-semibold border-b pb-2 mb-3">Composition vs Inheritance</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-2">Containment Example</h3>
-                <Card title="Generic Card Component">
-                  <p className="text-gray-700">
-                    This card uses `props.children` to contain arbitrary elements passed to it. This is a core composition pattern in React.
-                  </p>
-                </Card>
-              </div>
-
-              <div>
-                <h3 className="font-medium mb-2">Specialization Example</h3>
-                <p className="mb-3 text-sm text-gray-600">
-                  `ConfirmationDialog` is a specialized version of `Card`, configured via props. React favors composition over inheritance for code reuse.
-                </p>
-                <button
-                  onClick={() => setShowDialog(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Show Confirmation Dialog
-                </button>
-
-                {showDialog && (
-                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50"> {/* Added z-index */}
-                    <div className="max-w-md w-full">
-                      <ConfirmationDialog
-                        title="Confirm Action"
-                        message="Are you sure you want to perform this action?"
-                        onConfirm={() => {
-                          alert('Action confirmed!');
-                          setShowDialog(false);
-                        }}
-                        onCancel={() => setShowDialog(false)}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+           {/* Add Composition Example here */}
+           <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+             <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-green-300">Composition</h2>
+             <ConfirmationDialog
+               title="Confirm Action"
+               message="Are you sure you want to proceed?"
+               onConfirm={() => alert('Confirmed!')}
+               onCancel={() => alert('Cancelled!')}
+             />
+             <p className="mt-2 text-xs text-gray-500">Building complex UIs by combining simpler components.</p>
+           </section>
+           {/* Add Lifting State Up Example here */}
+           <section className="p-4 border rounded-xl shadow bg-gray-800/70 border-gray-700">
+             <h2 className="text-lg sm:text-xl font-bold border-b border-gray-600 pb-2 mb-3 text-purple-300">Lifting State Up</h2>
+             <LiftingStateUpExample />
+           </section>
         </div>
       </div>
 
-      {/* Thinking in React Section - unchanged */}
-      <section className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-100">
-        <h2 className="text-xl font-semibold mb-3">Thinking in React</h2>
+      {/* Thinking in React Section - styled to match */}
+      <section className="mb-8 sm:mb-10 p-4 sm:p-6 bg-gray-800/70 rounded-xl border border-gray-700 shadow">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-blue-300">Thinking in React</h2>
         <ol className="list-decimal ml-5 space-y-2">
-          <li className="text-gray-800">
-            <span className="font-medium">Break the UI into a component hierarchy</span>
-            <p className="text-sm text-gray-600">
+          <li className="text-gray-200">
+            <span className="font-semibold">Break the UI into a component hierarchy</span>
+            <p className="text-xs sm:text-sm text-gray-400">
               Single responsibility principle: a component should ideally do one thing.
             </p>
           </li>
-          <li className="text-gray-800">
-            <span className="font-medium">Build a static version first</span>
-            <p className="text-sm text-gray-600">
+          <li className="text-gray-200">
+            <span className="font-semibold">Build a static version first</span>
+            <p className="text-xs sm:text-sm text-gray-400">
               Build components that reuse other components and pass data using props.
             </p>
           </li>
-          <li className="text-gray-800">
-            <span className="font-medium">Identify the minimal UI state</span>
-            <p className="text-sm text-gray-600">
+          <li className="text-gray-200">
+            <span className="font-semibold">Identify the minimal UI state</span>
+            <p className="text-xs sm:text-sm text-gray-400">
               Figure out the absolute minimal representation of the state your UI needs.
             </p>
           </li>
-          <li className="text-gray-800">
-            <span className="font-medium">Identify where state should live</span>
-            <p className="text-sm text-gray-600">
+          <li className="text-gray-200">
+            <span className="font-semibold">Identify where state should live</span>
+            <p className="text-xs sm:text-sm text-gray-400">
               Figure out which component owns each piece of state.
             </p>
           </li>
-          <li className="text-gray-800">
-            <span className="font-medium">Add inverse data flow</span>
-            <p className="text-sm text-gray-600">
+          <li className="text-gray-200">
+            <span className="font-semibold">Add inverse data flow</span>
+            <p className="text-xs sm:text-sm text-gray-400">
               Support data flowing from child components back up to parents.
             </p>
           </li>

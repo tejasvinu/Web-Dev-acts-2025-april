@@ -21,7 +21,14 @@ exports.getTasks = async (req, res, next) => {
 // @access  Public
 exports.createTask = async (req, res, next) => {
   try {
-    const { title, description = '', priority = 'medium', dueDate = null } = req.body;
+    const { 
+      title, 
+      description = '', 
+      priority = 'medium', 
+      dueDate = null,
+      estimatedTime = '' 
+    } = req.body;
+    
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
@@ -32,6 +39,7 @@ exports.createTask = async (req, res, next) => {
       description, 
       priority, 
       dueDate,
+      estimatedTime,
       user: req.user.id 
     });
 
