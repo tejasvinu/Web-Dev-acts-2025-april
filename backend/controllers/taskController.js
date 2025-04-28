@@ -21,12 +21,37 @@ exports.getTasks = async (req, res, next) => {
 // @access  Public
 exports.createTask = async (req, res, next) => {
   try {
-    const { title, description = '', priority = 'medium' } = req.body;
+    const { title, description = '', priority = 'medium', dueDate = null } = req.body;
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
+    
     // Associate task with the logged-in user
-    const task = await Task.create({ title, description, priority, user: req.user.id });
+    const task = await Task.create({ 
+      title, 
+      description, 
+      priority, 
+      dueDate,
+      user: req.user.id 
+    });
+
+    console.log(task);
+    
+    // Optional: Set up a reminder if dueDate is provided
+    if (dueDate) {
+      const currentTime = new Date().getTime();
+      const dueTime = new Date(dueDate).getTime();
+      const timeUntilDue = dueTime - currentTime;
+      
+      // Only set reminder if due date is in the future
+      if (timeUntilDue > 0) {
+        setTimeout(() => {
+          console.log(`REMINDER: Task "${task.title}" (ID: ${task._id}) is now due!`);
+          // Note: In a real application, you'd use a proper job scheduler instead of setTimeout
+        }, timeUntilDue);
+      }
+    }
+    
     res.status(201).json({ task });
   } catch (err) {
     next(err);
@@ -39,16 +64,31 @@ exports.createTask = async (req, res, next) => {
 exports.updateTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, completed, priority } = req.body;
+    const { title, description, completed, priority, dueDate } = req.body;
     // Only allow updating user's own tasks
     const updatedTask = await Task.findOneAndUpdate(
       { _id: id, user: req.user.id },
-      { $set: { title, description, completed, priority } },
+      { $set: { title, description, completed, priority, dueDate } },
       { new: true, runValidators: true }
-    );
-    if (!updatedTask) {
+    );    if (!updatedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
+    
+    // Optional: Set up a reminder if dueDate is provided and was updated
+    if (dueDate) {
+      const currentTime = new Date().getTime();
+      const dueTime = new Date(dueDate).getTime();
+      const timeUntilDue = dueTime - currentTime;
+      
+      // Only set reminder if due date is in the future
+      if (timeUntilDue > 0) {
+        setTimeout(() => {
+          console.log(`REMINDER: Task "${updatedTask.title}" (ID: ${updatedTask._id}) is now due!`);
+          // Note: In a real application, you'd use a proper job scheduler instead of setTimeout
+        }, timeUntilDue);
+      }
+    }
+    
     res.json({ task: updatedTask });
   } catch (err) {
     next(err);

@@ -6,22 +6,33 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
+  const [dueDate, setDueDate] = useState('');
   const [errors, setErrors] = useState({});
   
   // Reference to the title input using React's useRef hook (Refs and the DOM)
   const titleInputRef = useRef(null);
-  
-  // If task is provided (for editing), populate form fields
+    // If task is provided (for editing), populate form fields
   useEffect(() => {
     if (task) {
       setTitle(task.title || '');
       setDescription(task.description || '');
       setPriority(task.priority || 'medium');
+      
+      // Format the due date for datetime-local input if it exists
+      if (task.dueDate) {
+        // Format: YYYY-MM-DDThh:mm
+        const date = new Date(task.dueDate);
+        const formattedDate = date.toISOString().slice(0, 16);
+        setDueDate(formattedDate);
+      } else {
+        setDueDate('');
+      }
     } else {
       // Reset form when task is null (for creating new tasks)
       setTitle('');
       setDescription('');
       setPriority('medium');
+      setDueDate('');
     }
     
     // Focus the title input when the component mounts
@@ -39,8 +50,7 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
-  // Form submission handler
+    // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -48,7 +58,8 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
       onSubmit({
         title,
         description,
-        priority
+        priority,
+        dueDate: dueDate || null
       });
       
       // Reset form if not editing
@@ -56,6 +67,7 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
         setTitle('');
         setDescription('');
         setPriority('medium');
+        setDueDate('');
         titleInputRef.current?.focus();
       }
     }
@@ -94,8 +106,7 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
           placeholder="Enter task description"
         ></textarea>
       </div>
-      
-      <div>
+        <div>
         <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
           Priority
         </label>
@@ -109,6 +120,20 @@ function TaskForm({ task = null, onSubmit, buttonText = 'Save Task' }) {
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
+      </div>
+      
+      <div>
+        <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+          Due Date
+        </label>
+        <input
+          type="datetime-local"
+          id="dueDate"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <p className="mt-1 text-xs text-gray-500">Set a due date and time for this task (optional)</p>
       </div>
       
       <div className="flex justify-end">

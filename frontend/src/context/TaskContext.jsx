@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { taskApi } from '../utils/api';
 import { useAuth } from './AuthContext';
+import { generateTasks } from '../utils/geminiApi';
 
 // Create the context
 const TaskContext = createContext();
@@ -86,6 +87,39 @@ export function TaskProvider({ children }) {
       throw error;
     }
   };
+  // Generate tasks using AI
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
+  
+  const generateAITasks = async (prompt) => {
+    setAiLoading(true);
+    setAiError(null);
+    
+    try {
+      // Get API key from environment variable (should be set in Vite)
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error('Missing Gemini API key');
+      }
+      
+      const generatedTasks = await generateTasks(apiKey, prompt);
+      
+      // Add each generated task to the database
+      const addedTasks = [];
+      for (const task of generatedTasks) {
+        const addedTask = await addTask(task);
+        addedTasks.push(addedTask);
+      }
+      
+      return addedTasks;
+    } catch (error) {
+      setAiError(error.message || 'Failed to generate tasks');
+      throw error;
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Value object that will be passed to consumers of this context
   const value = {
@@ -95,7 +129,10 @@ export function TaskProvider({ children }) {
     fetchTasks,
     addTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    generateAITasks,
+    aiLoading,
+    aiError
   };
 
   // Return the provider with the value object
