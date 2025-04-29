@@ -1,0 +1,220 @@
+.rbc-calendar {
+  font-family: 'Inter', sans-serif;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Header row with day names */
+.rbc-header {
+  padding: 10px 3px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Month view */
+.rbc-month-view {
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+/* Month row */
+.rbc-month-row {
+  overflow: hidden;
+}
+
+/* Day cells */
+.rbc-day-bg {
+  transition: background-color 0.2s ease;
+}
+
+.rbc-day-bg:hover {
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+/* Date cell (the number) */
+.rbc-date-cell {
+  padding: 5px 7px;
+  text-align: right;
+  font-size: 12px;
+}
+
+/* Today's date styling */
+.rbc-date-cell.rbc-now {
+  font-weight: bold;
+  color: #8b5cf6;
+}
+
+/* Off-range days (from prev/next month) */
+.rbc-off-range-bg {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Dark mode for off-range days */
+:global(.dark) .rbc-off-range-bg {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Event row */
+.rbc-row-content {
+  z-index: 0;
+}
+
+/* Event wrapper */
+.rbc-event {
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.rbc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  z-index: 10;
+}
+
+/* Event labels */
+.rbc-event-label {
+  font-size: 10px;
+}
+
+/* Event content */
+.rbc-event-content {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+/* Show more link */
+.rbc-show-more {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 5px;
+  color: #8b5cf6;
+  background-color: rgba(139, 92, 246, 0.08);
+  border-radius: 10px;
+}
+
+/* Agenda view */
+.rbc-agenda-view table {
+  border: none;
+}
+
+.rbc-agenda-view table thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.rbc-agenda-view table th {
+  font-weight: 500;
+  padding: 10px;
+}
+
+/* Time grid (Day/Week views) */
+.rbc-time-view {
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.rbc-time-content {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Time slot */
+.rbc-time-slot {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Current time indicator */
+.rbc-current-time-indicator {
+  background-color: #ef4444;
+  height: 2px;
+}
+
+/* Overlapping events in the same time slot */
+.rbc-events-container {
+  margin-right: 10px;
+}
+
+/* Popup overlay */
+.rbc-overlay {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 100;
+}
+
+/* Dark mode popup */
+@media (prefers-color-scheme: dark) {
+  .rbc-overlay {
+    background-color: #1f2937;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+}
+
+/* Event when selected */
+.rbc-selected {
+  background-color: rgba(139, 92, 246, 0.8) !important;
+}
+
+/* For best dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .rbc-today {
+    background-color: rgba(139, 92, 246, 0.2);
+  }
+  
+  .rbc-header {
+    color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(31, 41, 55, 0.5);
+  }
+  
+  .rbc-off-range-bg {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .rbc-day-bg {
+    background-color: rgba(31, 41, 55, 0.2);
+  }
+}
+
+/* Custom animations for events */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.rbc-event {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 640px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .rbc-toolbar-label {
+    order: -1;
+    margin-bottom: 10px;
+  }
+  
+  .rbc-header {
+    padding: 5px 2px;
+    font-size: 12px;
+  }
+  
+  .rbc-date-cell {
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+}

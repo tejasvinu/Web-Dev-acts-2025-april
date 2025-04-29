@@ -2,7 +2,6 @@
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { taskApi, aiApi } from '../utils/api';
 import { useAuth } from './AuthContext';
-import { generateTasks } from '../utils/geminiApi';
 
 // Create the context
 const TaskContext = createContext();
@@ -30,7 +29,7 @@ export function TaskProvider({ children }) {
     
     try {
       const response = await taskApi.getTasks();
-      setTasks(response.data.tasks); // Fix: use the 'tasks' array from the response
+      setTasks(response.data.tasks);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to fetch tasks');
       console.error('Error fetching tasks:', error);
@@ -49,9 +48,8 @@ export function TaskProvider({ children }) {
     
     try {
       const response = await taskApi.createTask(taskData);
-      // Correctly extract the task object from the response
       setTasks(prev => [...prev, response.data.task]); 
-      return response.data.task; // Return the actual task object
+      return response.data.task;
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to add task');
       throw error;
@@ -64,11 +62,10 @@ export function TaskProvider({ children }) {
     
     try {
       const response = await taskApi.updateTask(id, taskData);
-      // Correctly extract the updated task object from the response
       setTasks(prev => prev.map(task => 
         task._id === id ? response.data.task : task
       ));
-      return response.data.task; // Return the actual updated task object
+      return response.data.task;
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to update task');
       throw error;
@@ -87,6 +84,7 @@ export function TaskProvider({ children }) {
       throw error;
     }
   };
+
   // Generate tasks using AI
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -96,19 +94,11 @@ export function TaskProvider({ children }) {
     setAiError(null);
     
     try {
-      // Use generateTasks without passing apiKey (now uses env var internally)
-      const generatedTasks = await generateTasks(prompt);
-      
-      // Add each generated task to the database
-      const addedTasks = [];
-      for (const task of generatedTasks) {
-        const addedTask = await addTask(task);
-        addedTasks.push(addedTask);
-      }
-      
-      return addedTasks;
+      const response = await aiApi.generateTasks(prompt);
+      setTasks(prev => [...prev, ...response.data.tasks]);
+      return response.data.tasks;
     } catch (error) {
-      setAiError(error.message || 'Failed to generate tasks');
+      setAiError(error.response?.data?.message || 'Failed to generate tasks');
       throw error;
     } finally {
       setAiLoading(false);

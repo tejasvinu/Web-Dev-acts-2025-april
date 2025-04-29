@@ -6,11 +6,13 @@ import TaskList from '../components/TaskList';
 import ErrorBoundary from '../components/ErrorBoundary';
 import AITaskGenerator from '../components/AITaskGenerator';
 import TaskForm from '../components/TaskForm';
+import TaskCalendar from '../components/TaskCalendar'; // Import the calendar component
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 function Tasks() {
   const { user } = useAuth();
   const [showManualForm, setShowManualForm] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
   const { addTask } = useTask();
 
   const handleManualSubmit = async (taskData) => {
@@ -25,7 +27,7 @@ function Tasks() {
 
   return (
     <div className="min-h-full">
-      <div className="max-w-2xl mx-auto px-4 pt-2 sm:pt-4 pb-12">
+      <div className="max-w-4xl mx-auto px-4 pt-2 sm:pt-4 pb-12"> {/* Increased max-width for calendar */}
         {/* User info with dark theme styling */}
         <header className="flex justify-end items-center mb-4 sm:mb-6">
           {user && (
@@ -92,9 +94,36 @@ function Tasks() {
               )}
             </AnimatePresence>
 
-            {/* Task List */}
+            {/* View Mode Toggle */}
+            <motion.section
+              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="inline-flex rounded-md shadow-sm bg-gray-800/70 border border-gray-700 p-0.5">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-1.5 text-xs rounded-l-md transition-colors duration-200 ${
+                    viewMode === 'list' ? 'bg-purple-700 text-white' : 'text-gray-300 hover:bg-gray-700/80'
+                  }`}
+                >
+                  List View
+                </button>
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-4 py-1.5 text-xs rounded-r-md transition-colors duration-200 ${
+                    viewMode === 'calendar' ? 'bg-purple-700 text-white' : 'text-gray-300 hover:bg-gray-700/80'
+                  }`}
+                >
+                  Calendar View
+                </button>
+              </div>
+            </motion.section>
+
+            {/* Task List or Calendar View */}
             <section className="pt-1">
-              <TaskList />
+              {viewMode === 'list' ? <TaskList /> : <TaskCalendar />}
             </section>
           </ErrorBoundary>
         </div>

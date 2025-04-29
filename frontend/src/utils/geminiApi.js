@@ -2,7 +2,7 @@
 import { aiApi } from './api';
 
 /**
- * Generate tasks based on user input using Google's Gemini API directly via REST
+ * Generate tasks based on user input using Google's Gemini API via backend
  * @param {string} userInput - User prompt for task generation
  * @returns {Promise<Array>} Array of generated tasks
  */
